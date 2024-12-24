@@ -49,13 +49,16 @@ def echo_all(message):
 def answer(call):
     if call.data == 'btn1':
         with Session(engine) as session:
-            u = select(User).where(User.telegram_id == call.message.from_user.id)
-            m = select(Messages).where(Messages.user == u).limit(1)
-        bot.send_message(call.message.chat.id, m[-1])
+            u = select(User).where(User.telegram_id == call.from_user.id)
+            user = session.scalars(u).one()
+            m = select(Messages).where(Messages.user == user).limit(1)
+            msg = session.scalars(m).one()
+        bot.send_message(call.message.chat.id, msg)
     elif call.data == 'btn2':
         with Session(engine) as session:
             m = select(Messages).limit(1)
-        bot.send_message(call.message.chat.id, m[0])
+            msg = session.scalars(m).one()
+        bot.send_message(call.message.chat.id, msg)
 
 
 bot.infinity_polling()
